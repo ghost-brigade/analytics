@@ -1,5 +1,8 @@
 import type { AnalyticsConfig } from "./types/Analytics.js";
 import { AnalyticsEvent } from "./types/Event.js";
+export declare function serverSendEvent(data: {
+    [key: string]: string | number;
+}, id: string): Promise<void>;
 export declare class Analytics {
     config: AnalyticsConfig;
     constructor(config: AnalyticsConfig);

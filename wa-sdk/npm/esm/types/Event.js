@@ -7,4 +7,5 @@ export var EventType;
     EventType["MouseEvent"] = "mouseevent";
     EventType["PageLeave"] = "pageleave";
     EventType["LinkClick"] = "linkclick";
+    EventType["ServerEvent"] = "serverevent";
 })(EventType || (EventType = {}));

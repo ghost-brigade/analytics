@@ -2,6 +2,22 @@ import { isBrowser } from "./utils/isBrowser.js";
 import type { AnalyticsConfig } from "./types/Analytics.js";
 import { AnalyticsEvent, EventType } from "./types/Event.js";
 
+export async function serverSendEvent(data: {[key: string]: string | number}, id: string) {
+  EventType.ServerEvent,
+  data.id = id,
+  data.timestamp = new Date().getTime();
+  await fetch('http://localhost:3000/analytics-endpoint', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      type: EventType.ServerEvent,
+      data: data
+    })
+  });
+}
+
 export class Analytics {
   config: AnalyticsConfig;
   constructor(config: AnalyticsConfig) {

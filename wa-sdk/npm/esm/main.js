@@ -1,5 +1,20 @@
 import { isBrowser } from "./utils/isBrowser.js";
 import { EventType } from "./types/Event.js";
+export async function serverSendEvent(data, id) {
+    EventType.ServerEvent,
+        data.id = id,
+        data.timestamp = new Date().getTime();
+    await fetch('http://localhost:3000/analytics-endpoint', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            type: EventType.ServerEvent,
+            data: data
+        })
+    });
+}
 export class Analytics {
     constructor(config) {
         Object.defineProperty(this, "config", {

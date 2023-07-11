@@ -1,8 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Analytics = void 0;
+exports.Analytics = exports.serverSendEvent = void 0;
 const isBrowser_js_1 = require("./utils/isBrowser.js");
 const Event_js_1 = require("./types/Event.js");
+async function serverSendEvent(data, id) {
+    Event_js_1.EventType.ServerEvent,
+        data.id = id,
+        data.timestamp = new Date().getTime();
+    await fetch('http://localhost:3000/analytics-endpoint', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            type: Event_js_1.EventType.ServerEvent,
+            data: data
+        })
+    });
+}
+exports.serverSendEvent = serverSendEvent;
 class Analytics {
     constructor(config) {
         Object.defineProperty(this, "config", {

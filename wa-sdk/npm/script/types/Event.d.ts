@@ -11,5 +11,6 @@ export declare enum EventType {
     Custom = "custom",
     MouseEvent = "mouseevent",
     PageLeave = "pageleave",
-    LinkClick = "linkclick"
+    LinkClick = "linkclick",
+    ServerEvent = "serverevent"
 }

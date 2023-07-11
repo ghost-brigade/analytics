@@ -11,4 +11,5 @@ export enum EventType {
   MouseEvent = "mouseevent",
   PageLeave = "pageleave",
   LinkClick = "linkclick",
+  ServerEvent = "serverevent",
 }
