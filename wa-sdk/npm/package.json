@@ -1,0 +1,20 @@
+{
+  "module": "./esm/main.js",
+  "main": "./script/main.js",
+  "name": "wa-sdk",
+  "version": "0.1.2",
+  "description": "WebAnalytics browser and server SDK",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./esm/main.js",
+      "require": "./script/main.js"
+    }
+  },
+  "scripts": {
+    "test": "node test_runner.js"
+  },
+  "devDependencies": {
+    "picocolors": "^1.0.0"
+  }
+}
