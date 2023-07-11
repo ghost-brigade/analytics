@@ -18,9 +18,19 @@ export class Analytics {
     }
     await this.registerServiceWorker();
 
+    this.sendEvent({
+      type: EventType.PageView, data: {
+        timestamp: new Date().getTime(), url: globalThis.location.href
+      }
+    });
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
-        this.sendEvent({ type: EventType.PageLeave, data: { timestamp: new Date().getTime() } });
+        this.sendEvent({
+          type: EventType.PageLeave, data: {
+            timestamp: new Date().getTime(), url: globalThis.location.href
+          }
+        });
       }
     });
 
@@ -33,19 +43,14 @@ export class Analytics {
 
     const identifier = `${language}${vendor}${appVersion}${platform}${productSub}${width}${height}${colorDepth}`;
     console.log(identifier);
-    const msgBuffer = new TextEncoder().encode(identifier);                    
+    const msgBuffer = new TextEncoder().encode(identifier);
 
-    // hash the message
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-
-    // convert ArrayBuffer to Array
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-
-    // convert bytes to hex string                  
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     console.log(hashHex);
     return hashHex;
-    
+
   }
 
   async registerServiceWorker() {

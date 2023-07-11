@@ -26,7 +26,11 @@ export class Analytics {
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden') {
-        this.sendEvent({ type: EventType.PageLeave, data: { timestamp: new Date().getTime() } });
+        this.sendEvent({
+          type: EventType.PageLeave, data: {
+            timestamp: new Date().getTime(), url: window.location.href
+          }
+        });
       }
     });
 
