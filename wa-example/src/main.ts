@@ -1,5 +1,5 @@
-import { Analytics } from "wa-sdk";
+import { Analytics, EventType } from "wa-sdk";
 
-const analytics = new Analytics({ id: "" });
+const analytics = new Analytics({ appId: "SOME_APP_ID", endpoint: "http://localhost:3000" });
 
-analytics.sendEvent({type: "event_name", data: { key: "value" }});
+analytics.sendEvent({type: EventType.PageView, data: { url: "value" }});

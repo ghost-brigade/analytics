@@ -10,7 +10,7 @@ await build({
     lib: [
       "ESNext",
       "DOM",
-    ]
+    ],
   },
   shims: {
     deno: false,

@@ -1,6 +1,11 @@
 export type AnalyticsEvent = {
     type: EventType;
     data: {
+        timestamp?: number;
+        id?: string;
+        appSecret?: string;
+        appId?: string;
+    } & {
         [key: string]: string | number;
     };
 };

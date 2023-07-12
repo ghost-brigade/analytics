@@ -2,7 +2,7 @@
   "module": "./esm/main.js",
   "main": "./script/main.js",
   "name": "wa-sdk",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "WebAnalytics browser and server SDK",
   "license": "MIT",
   "exports": {

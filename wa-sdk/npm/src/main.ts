@@ -2,26 +2,22 @@ import { isBrowser } from "./utils/isBrowser.js";
 import type { AnalyticsConfig } from "./types/Analytics.js";
 import { AnalyticsEvent, EventType } from "./types/Event.js";
 
-export async function serverSendEvent(data: {[key: string]: string | number}, id: string) {
-  EventType.ServerEvent,
-  data.id = id,
-  data.timestamp = new Date().getTime();
-  await fetch('http://localhost:3000/analytics-endpoint', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      type: EventType.ServerEvent,
-      data: data
-    })
-  });
-}
+export { EventType };
 
+/**
+ * Analytics class
+ */
 export class Analytics {
   config: AnalyticsConfig;
   constructor(config: AnalyticsConfig) {
     this.config = config;
+    if (!config.appId) {
+      throw new Error("App ID must be provided");
+    } else if (!isBrowser() && !config.appSecret) {
+      throw new Error("App secret must be provided for server side analytics");
+    } else if (!config.endpoint) {
+      throw new Error("Analytics endpoint must be provided");
+    }
     this.init(config);
   }
 
@@ -35,17 +31,19 @@ export class Analytics {
     await this.registerServiceWorker();
 
     this.sendEvent({
-      type: EventType.PageView, data: {
-        timestamp: new Date().getTime(), url: globalThis.location.href
-      }
+      type: EventType.PageView,
+      data: {
+        url: globalThis.location.href,
+      },
     });
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
         this.sendEvent({
-          type: EventType.PageLeave, data: {
-            timestamp: new Date().getTime(), url: globalThis.location.href
-          }
+          type: EventType.PageLeave,
+          data: {
+            url: globalThis.location.href,
+          },
         });
       }
     });
@@ -53,70 +51,94 @@ export class Analytics {
     this.registerEvents();
   }
 
-  async generateUserIdentifier() {
+  private async generateUserIdentifier() {
     const { language, vendor, appVersion, platform, productSub } = navigator;
     const { width, height, colorDepth } = globalThis.screen;
 
-    const identifier = `${language}${vendor}${appVersion}${platform}${productSub}${width}${height}${colorDepth}`;
+    const identifier =
+      `${language}${vendor}${appVersion}${platform}${productSub}${width}${height}${colorDepth}`;
     console.log(identifier);
     const msgBuffer = new TextEncoder().encode(identifier);
 
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join(
+      "",
+    );
     console.log(hashHex);
     return hashHex;
-
   }
 
-  async registerServiceWorker() {
-    if ('serviceWorker' in navigator) {
+  private async registerServiceWorker() {
+    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
       try {
-        const registration = await navigator.serviceWorker.register('/sw.js');
-        console.log('Service worker registration successful', registration);
+        localStorage.setItem("analyticsConfig", JSON.stringify(this.config));
+        const registration = await navigator.serviceWorker.register("/sw.js");
+        navigator.serviceWorker.controller.postMessage(this.config);
+        console.log("Service worker registration successful", registration);
       } catch (error) {
-        console.log('Service worker registration failed', error);
+        console.log("Service worker registration failed", error);
       }
     }
   }
 
-  sendEvent(eventData: AnalyticsEvent) {
-    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-      console.log(this.config)
-      eventData.data.id = this.config.id;
+  async sendEvent(eventData: AnalyticsEvent) {
+    eventData.data.id = this.config.id || await this.generateUserIdentifier();
+    eventData.data.appId = this.config.appId;
+    eventData.data.timestamp = new Date().getTime();
+    if (
+      "serviceWorker" in navigator && navigator.serviceWorker.controller &&
+      isBrowser()
+    ) {
       navigator.serviceWorker.controller.postMessage(eventData);
     } else {
-      console.error('Service worker is not available');
+      eventData.data.appSecret = this.config.appSecret;
+      await fetch(this.config.endpoint as string, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          eventData,
+        ),
+      });
     }
   }
 
-  registerEvents() {
+  private registerEvents() {
     if (!isBrowser()) {
       return;
     }
-    const links = document.querySelectorAll('a');
+    const links = document.querySelectorAll("a");
     links.forEach((link) => {
-      link.addEventListener('click', (event) => {
-        this.sendEvent({ type: EventType.LinkClick, data: { timestamp: new Date().getTime(), href: link.href } });
-      });
-    });
-
-    const forms = document.querySelectorAll('form');
-    forms.forEach((form) => {
-      form.addEventListener('submit', (event) => {
+      link.addEventListener("click", () => {
         this.sendEvent({
-          type: EventType.FormSubmit, data: {
-            timestamp: new Date().getTime(), action: form.action, method: form.method
-          }
+          type: EventType.LinkClick,
+          data: { href: link.href },
         });
       });
     });
 
-    document.addEventListener('click', (event) => {
+    const forms = document.querySelectorAll("form");
+    forms.forEach((form) => {
+      form.addEventListener("submit", () => {
+        this.sendEvent({
+          type: EventType.FormSubmit,
+          data: {
+            action: form.action,
+            method: form.method,
+          },
+        });
+      });
+    });
+
+    document.addEventListener("click", (event) => {
       this.sendEvent({
-        type: EventType.Click, data: {
-          timestamp: new Date().getTime(), x: event.clientX, y: event.clientY
-        }
+        type: EventType.Click,
+        data: {
+          x: event.clientX,
+          y: event.clientY,
+        },
       });
     });
   }

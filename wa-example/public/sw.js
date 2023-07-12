@@ -1,15 +1,18 @@
 let eventQueue = [];
 let lastSendTime = Date.now();
-const ANALYTICS_ENDPOINT = 'http://localhost:3000/analytics-endpoint';
-const MAX_QUEUE_SIZE = 10;
-const MAX_TIME = 5000;
 
-self.addEventListener('message', event => {
+self.addEventListener("message", (event) => {
   eventQueue.push(event.data);
-  
+
   if (shouldSendEvents()) {
     sendEvents();
   }
+});
+
+self.addEventListener("config", (event) => {
+  ANALYTICS_ENDPOINT = event.data.endpoint;
+  MAX_QUEUE_SIZE = event.data.maxQueueSize || 10;
+  MAX_TIME = event.data.maxTime || 5000;
 });
 
 function shouldSendEvents() {
@@ -18,19 +21,9 @@ function shouldSendEvents() {
 }
 
 function sendEvents() {
-  fetch(ANALYTICS_ENDPOINT, {
-    method: 'POST',
-    body: JSON.stringify(eventQueue),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }).then(() => {
-    console.log('Sent analytics data');
-    eventQueue = [];
-    lastSendTime = Date.now();
-  }).catch(error => {
-    console.log('Failed to send analytics data', error);
-  });
+  navigator.sendBeacon(ANALYTICS_ENDPOINT, JSON.stringify(eventQueue));
+  lastSendTime = Date.now();
+  eventQueue = [];
 }
 
 setInterval(() => {

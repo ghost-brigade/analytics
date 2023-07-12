@@ -1,6 +1,11 @@
 export type AnalyticsEvent = {
   type: EventType;
-  data: {[key: string]: string | number};
+  data: {
+    timestamp?: number;
+    id?: string;
+    appSecret?: string;
+    appId?: string;
+  } & { [key: string]: string | number };
 };
 
 export enum EventType {
