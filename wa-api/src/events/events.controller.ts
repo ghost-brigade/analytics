@@ -24,12 +24,8 @@ export class EventsController {
     return this.eventsService.findOne(+id);
   }
 
-  @Sse("sse")
-  sse(): Observable<Event> {
-    return interval(1000).pipe(
-      map((count) => ({
-        data: `Event ${count}`,
-      }))
-    );
+  @Get("sse")
+  sse(): Observable<MessageEvent> {
+    return this.eventsService.sseEvents();
   }
 }
