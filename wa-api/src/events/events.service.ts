@@ -40,6 +40,4 @@ export class EventsService {
   findOne(id: number) {
     return `This action returns a #${id} event`;
   }
-
-
 }
