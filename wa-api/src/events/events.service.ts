@@ -7,12 +7,12 @@ import { Observable, interval, map, mergeMap } from "rxjs";
 
 @Injectable()
 export class EventsService {
-  sseEventsObservable: Observable<MessageEvent<string>> = new Observable();
+  sseEventsObservable: Observable<MessageEvent> = new Observable();
   constructor(
     @InjectRepository(Event) private eventsRepository: Repository<Event>
   ) {}
 
-  sseEvents(): Observable<MessageEvent<string>> {
+  sseEvents(): Observable<MessageEvent> {
     return this.sseEventsObservable;
   }
 
