@@ -22,7 +22,7 @@ export class EventsController {
     return this.eventsService.findOne(+id);
   }
 
-  @Get("sse")
+  @Sse("sse")
   sse(): Observable<MessageEvent> {
     return this.eventsService.sseEvents();
   }
