@@ -10,10 +10,10 @@ export class EventsService {
     @InjectRepository(Event) private eventsRepository: Repository<Event>
   ) {}
 
-  create(createEventDto: CreateEventDto): boolean {
+  async create(createEventDto: CreateEventDto): Promise<boolean> {
     try {
-      const event = this.eventsRepository.create(createEventDto);
-      this.eventsRepository.save(event);
+      const event = await this.eventsRepository.create(createEventDto);
+      await this.eventsRepository.save(event);
 
       return true;
     } catch (error) {
@@ -21,19 +21,23 @@ export class EventsService {
     }
   }
 
-  findAll() {
-    return `This action returns all events`;
+  async createMany(createEventDto: CreateEventDto[]): Promise<boolean> {
+    try {
+      const events = await this.eventsRepository.create(createEventDto);
+      await this.eventsRepository.save(events);
+
+      return true;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+
+  async findAll() {
+    const events = await this.eventsRepository.find();
+    return events;
   }
 
   findOne(id: number) {
     return `This action returns a #${id} event`;
-  }
-
-  update(id: number, updateEventDto: UpdateEventDto) {
-    return `This action updates a #${id} event`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} event`;
   }
 }

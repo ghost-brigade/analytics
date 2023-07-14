@@ -7,5 +7,5 @@ export class CreateEventDto {
     id: string;
     appId: string;
     timestamp: number;
-  };
+  } & Record<string, unknown>;
 }
