@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, Sse } from "@nestjs/common";
 import { EventsService } from "./events.service";
 import { CreateEventDto } from "./dto/create-event.dto";
 
@@ -19,5 +19,10 @@ export class EventsController {
   @Get(":id")
   findOne(@Param("id") id: string) {
     return this.eventsService.findOne(+id);
+  }
+
+  @Sse("sse")
+  sse(): Observable<MessageEvent> {
+    // retourne l'event
   }
 }
