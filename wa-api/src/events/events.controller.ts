@@ -2,8 +2,6 @@ import { Controller, Get, Post, Body, Param, Sse } from "@nestjs/common";
 import { EventsService } from "./events.service";
 import { CreateEventDto } from "./dto/create-event.dto";
 import { Observable } from "rxjs";
-import { interval } from "rxjs";
-import { map } from "rxjs/operators";
 
 @Controller("events")
 export class EventsController {
