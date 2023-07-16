@@ -1,14 +1,7 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  HttpException,
-  HttpStatus,
-} from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Observable } from "rxjs";
 import { Request } from "express";
 import { UsersService } from "src/users/users.service";
-import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class EventGuard implements CanActivate {
