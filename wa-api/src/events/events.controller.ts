@@ -7,7 +7,12 @@ import { Observable } from "rxjs";
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Post()
+  @Post("")
+  async create(@Body() createEventDto: CreateEventDto) {
+    return await this.eventsService.create(createEventDto);
+  }
+
+  @Post("many")
   async createMany(@Body() createEventDto: CreateEventDto[]) {
     return await this.eventsService.createMany(createEventDto);
   }
